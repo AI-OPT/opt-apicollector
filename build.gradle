@@ -1,0 +1,83 @@
+group 'com.ai.runner.plugin'
+version '2.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
+
+sourceCompatibility = 1.7
+
+ext {
+    moduleName = "apicollector"
+    publishUserName = "runnerdev"
+    publishUserPassword = "runnerdev"
+    publishURL = "http://10.1.228.199:18081/nexus/content/repositories/snapshots/"
+    builtBy = "gradle 2.2"
+}
+
+repositories {
+    maven { url "http://10.1.228.199:18081/nexus/content/groups/public/" }
+}
+
+configurations {
+    jaxDoclet
+}
+
+dependencies {
+    compile files("${System.properties['java.home']}/../lib/tools.jar")
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile 'com.google.code.gson:gson:2.3.1'
+    compile 'org.elasticsearch:elasticsearch:1.7.1'
+    compile 'com.alibaba:fastjson:1.2.6'
+}
+
+task publishJar(type: Jar) {
+    version version
+    baseName moduleName
+    from sourceSets.main.output
+    destinationDir file("$buildDir/libs")
+    manifest {
+        attributes 'packageName': moduleName, 'Built-By': builtBy, 'Built-date': new Date().format('yyyy-MM-dd HH:mm:ss'), 'Manifest-Version': version
+    }
+}
+
+publishing {
+    publications {
+        publishing.publications.create("${moduleName}", MavenPublication) {
+            groupId group
+            artifactId moduleName
+            version version
+            artifact publishJar
+            pom.withXml {
+                asNode().children().last() + {
+                    delegate.dependencies {
+                        delegate.dependency {
+                            delegate.groupId("org.elasticsearch")
+                            delegate.artifactId("elasticsearch")
+                            delegate.version("1.6.0")
+                        }
+                        delegate.dependency {
+                            delegate.groupId("com.google.code.gson")
+                            delegate.artifactId("gson")
+                            delegate.version("2.3.1")
+                        }
+                        delegate.dependency {
+                            delegate.groupId("com.alibaba")
+                            delegate.artifactId("fastjson")
+                            delegate.version("1.2.6")
+                        }
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            url publishURL
+            credentials {
+                username = publishUserName
+                password = publishUserPassword
+            }
+        }
+    }
+}
