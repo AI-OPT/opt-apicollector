@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.apache.lucene.queryparser.flexible.core.util.StringUtils;
 
-import com.ai.runner.apicollector.util.ElasticSearchHandler;
+import com.ai.runner.apicollector.util.APIESFactory;
 import com.ai.runner.apicollector.util.JavaDocletUtil;
 import com.ai.runner.apicollector.util.ReflectUtil;
 import com.ai.runner.apicollector.vo.APIClassDoc;
@@ -93,9 +93,9 @@ public class APIDoclet extends Doclet {
         doc.setOwner(owner);
         doc.setOwnerType(ownerType);
         doc.setId(JavaDocletUtil.getAPIOwnerHashCode(owner, ownerType));
-        new ElasticSearchHandler(esconfig).addIndex(ElasticIndex.API.name().toLowerCase(),
-                ElasticType.API_OWNER.name().toLowerCase(), StringUtils.toString(doc.getId()),
-                JSON.toJSONString(doc));
+        APIESFactory.getElasticSearchHandler(esconfig).addIndex(
+                ElasticIndex.API.name().toLowerCase(), ElasticType.API_OWNER.name().toLowerCase(),
+                StringUtils.toString(doc.getId()), JSON.toJSONString(doc));
 
     }
 
@@ -187,7 +187,8 @@ public class APIDoclet extends Doclet {
             }
         }
         doc.setExceptions(exceptions.toString().replaceAll("^\\[| |\\]$", ""));
-        new ElasticSearchHandler(esconfig).addIndex(ElasticIndex.API.name().toLowerCase(),
+        APIESFactory.getElasticSearchHandler(esconfig).addIndex(
+                ElasticIndex.API.name().toLowerCase(),
                 ElasticType.API_VERSION_HISTORY.name().toLowerCase(),
                 StringUtils.toString(doc.getId()), JSON.toJSONString(doc));
     }
@@ -235,7 +236,8 @@ public class APIDoclet extends Doclet {
             }
         }
         doc.setExceptions(exceptions.toString().replaceAll("^\\[| |\\]$", ""));
-        new ElasticSearchHandler(esconfig).addIndex(ElasticIndex.API.name().toLowerCase(),
+        APIESFactory.getElasticSearchHandler(esconfig).addIndex(
+                ElasticIndex.API.name().toLowerCase(),
                 ElasticType.API_VERSION_NEW.name().toLowerCase(),
                 StringUtils.toString(doc.getId()), JSON.toJSONString(doc));
     }
@@ -248,7 +250,8 @@ public class APIDoclet extends Doclet {
      * @ApiDocMethod
      */
     private static void buildAPIClassDetailIndex(APIClassDoc doc) {
-        new ElasticSearchHandler(esconfig).addIndex(ElasticIndex.API.name().toLowerCase(),
+        APIESFactory.getElasticSearchHandler(esconfig).addIndex(
+                ElasticIndex.API.name().toLowerCase(),
                 ElasticType.CLASS_DETAIL.name().toLowerCase(), StringUtils.toString(doc.getId()),
                 JSON.toJSONString(doc));
 
