@@ -218,7 +218,7 @@ public class JavaDocletUtil {
         String restURL = JavaDocletUtil.getMethodTagComment(methodDoc, "RestRelativeURL");
         if (restURL == null || restURL.equals("")) {
             throw new RuntimeException("此服务[" + methodDoc.name()
-                    + "]使用了Path注解，请指定@RestURL注释说明REST的地址后段");
+                    + "]使用了Path注解，请指定@RestRelativeURL注释说明REST的地址后段");
         }
         return restURL.trim();
     }
